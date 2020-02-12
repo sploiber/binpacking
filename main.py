@@ -70,7 +70,7 @@ def main(data_file_name, bin_size, lagrange):
     sampler = ExactSolver()
     response = sampler.sample(bqm)
     for sample, energy in response.data(['sample', 'energy']):
-        print(sample, energy)
+        print("Bins ",BP.get_bins_used(sample), sample, energy)
 
 
 if __name__ == '__main__':

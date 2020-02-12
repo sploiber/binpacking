@@ -72,5 +72,7 @@ class BinPacking(object):
     def get_bqm(self):
         return dimod.BinaryQuadraticModel.from_qubo(self.qubo)
 
+    def get_bins_used(self, solution):
+        return [i for i in solution.keys() if 'y' in i and solution[i] == 1]
     def get_names(self, solution):
         return [self.names[i] for i in range(len(self.costs)) if solution[i] == 1.]
