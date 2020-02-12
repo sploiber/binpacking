@@ -58,11 +58,11 @@ def main(data_file_name, bin_size, lagrange):
 
     # parse input data
     df = pd.read_csv(data_file_name, header=None)
-    df.columns = ['name', 'wt']
+    df.columns = ['weight']
 
     # create the BinPacking object
     Lagrange = 2500
-    BP = BinPacking(df['name'], df['wt'], V, Lagrange_param)
+    BP = BinPacking(df['weight'], V, Lagrange_param)
 
     # Obtain the knapsack BQM
     bqm = BP.get_bqm()
@@ -70,7 +70,7 @@ def main(data_file_name, bin_size, lagrange):
     sampler = ExactSolver()
     response = sampler.sample(bqm)
     for sample, energy in response.data(['sample', 'energy']):
-        print("Bins ",BP.get_bins_used(sample), sample, energy)
+        print("Bins ", BP.get_bins_used(sample), sample, energy)
 
 
 if __name__ == '__main__':
