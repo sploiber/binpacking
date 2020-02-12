@@ -23,14 +23,15 @@ import click
 @click.argument('data_file_name')
 @click.argument('bin_size', default=1.)
 @click.argument('lagrange', default=2500)
-def main(data_file_name, bin_size, lagrange):
+@click.argument('n_bins', default=1.)
+def main(data_file_name, bin_size, lagrange, n_bins):
 
     # check that the user has provided data file name, and bin size
     try:
         with open(data_file_name, "r") as myfile:
             input_data = myfile.readlines()
     except IndexError:
-        print("Usage: binpacking.py: <data file> <bin_size> <lagrange>")
+        print("Usage: binpacking.py: <data file> <bin_size> <lagrange> <n_bins>")
         exit(1)
     except IOError:
         print("binpacking.py: data file <" + data_file_name + "> missing")
@@ -49,11 +50,17 @@ def main(data_file_name, bin_size, lagrange):
     try:
         Lagrange_param = float(lagrange)
     except IndexError:
-        print("Usage: binpacking.py: <data file> <bin_size> <lagrange>")
+        print("Usage: binpacking.py: <data file> <bin_size> <lagrange> <n_bins>")
         exit(1)
 
     if Lagrange_param <= 0.:
         print("Usage: binpacking.py: <lagrange> must be positive")
+        exit(1)
+
+    try:
+        Num_bins = int(n_bins)
+    except ValueError:
+        print("Usage: binpacking.py: <data file> <bin_size> <lagrange> <n_bins>")
         exit(1)
 
     # parse input data
@@ -62,7 +69,7 @@ def main(data_file_name, bin_size, lagrange):
 
     # create the BinPacking object
     Lagrange = 2500
-    BP = BinPacking(df['weight'], V, Lagrange_param)
+    BP = BinPacking(df['weight'], V, Lagrange_param, Num_bins)
 
     # Obtain the knapsack BQM
     bqm = BP.get_bqm()

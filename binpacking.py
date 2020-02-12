@@ -21,7 +21,7 @@ from math import ceil
 
 class BinPacking(object):
 
-    def __init__(self, weights, V, Lagrange):
+    def __init__(self, weights, V, Lagrange, num_bins):
 
         self.weights = weights
 
@@ -37,15 +37,15 @@ class BinPacking(object):
         # Each item has to be in one bin.
         # sum_i (x_ij) = 1, for each j.
         for j in range(x_size):
-            for i in range(x_size):
+            for i in range(num_bins):
                 x_ij = 'x' + str(i) + str(j)
                 self.qubo[(x_ij, x_ij)] = -1
-                for k in range(i + 1, x_size):
+                for k in range(i + 1, num_bins):
                     self.qubo[(x_ij, 'x' + str(k) + str(j))] = 2
 
         # For each bin (each i), there is an inequality:
         # (sum a0x_i0 + a1x_i1 + a2x_i2 +... - Vy_i + 2**0k_i0 + 2**1k_i1 + ..) ** 2
-        for i in range(x_size):
+        for i in range(num_bins):
 
             # y_i y_i term
             y_i = 'y' + str(i)
@@ -71,7 +71,7 @@ class BinPacking(object):
                 for k in range(j + 1, k_limit):
                     self.qubo[(k_ij, 'k' + str(i) + str(k))] = 2 * (2 ** j) * (2 ** k)
 
-        for i in range(x_size):
+        for i in range(num_bins):
 
             y_i = 'y' + str(i)
             for j in range(x_size):
@@ -82,13 +82,13 @@ class BinPacking(object):
                 self.qubo[('k' + str(i) + str(j), y_i)] = -2 * V * (2 ** j)
 
         # x_ij k_ik terms
-        for i in range(x_size):
+        for i in range(num_bins):
             for j in range(x_size):
                 for k in range(k_limit):
                     self.qubo[('x' + str(i) + str(j), 'k' + str(i) + str(k))] = 2 * weights[j] * (2 ** k)
 
         # Sum over all bins - this is the number to  minimize
-        for i in range(x_size):
+        for i in range(num_bins):
             y_i = 'y' + str(i)
             self.qubo[(y_i, y_i)] = Lagrange
 
