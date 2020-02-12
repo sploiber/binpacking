@@ -22,14 +22,15 @@ import click
 @click.command()
 @click.argument('data_file_name')
 @click.argument('bin_size', default=1.)
-def main(data_file_name, bin_size):
+@click.argument('lagrange', default=2500)
+def main(data_file_name, bin_size, lagrange):
 
     # check that the user has provided data file name, and bin size
     try:
         with open(data_file_name, "r") as myfile:
             input_data = myfile.readlines()
     except IndexError:
-        print("Usage: binpacking.py: <data file> <bin_size>")
+        print("Usage: binpacking.py: <data file> <bin_size> <lagrange>")
         exit(1)
     except IOError:
         print("binpacking.py: data file <" + data_file_name + "> missing")
@@ -45,13 +46,23 @@ def main(data_file_name, bin_size):
         print("Usage: binpacking.py: <bin_size> must be positive")
         exit(1)
 
+    try:
+        Lagrange_param = float(lagrange)
+    except IndexError:
+        print("Usage: binpacking.py: <data file> <bin_size> <lagrange>")
+        exit(1)
+
+    if Lagrange_param <= 0.:
+        print("Usage: binpacking.py: <lagrange> must be positive")
+        exit(1)
+
     # parse input data
     df = pd.read_csv(data_file_name, header=None)
     df.columns = ['name', 'wt']
 
     # create the BinPacking object
     Lagrange = 2500
-    BP = BinPacking(df['name'], df['wt'], V, Lagrange)
+    BP = BinPacking(df['name'], df['wt'], V, Lagrange_param)
 
     # Obtain the knapsack BQM
     bqm = BP.get_bqm()
