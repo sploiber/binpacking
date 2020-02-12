@@ -43,33 +43,51 @@ class BinPacking(object):
                 for k in range(i + 1, x_size):
                     self.qubo[(x_ij, 'x' + str(k) + str(j))] = 2
 
+        # For each bin (each i), there is an inequality:
+        # (sum a0x_i0 + a1x_i1 + a2x_i2 +... - Vy_i + 2**0k_i0 + 2**1k_i1 + ..) ** 2
         for i in range(x_size):
+
+            # y_i y_i term
             y_i = 'y' + str(i)
             self.qubo[(y_i, y_i)] = V * V
+
             for j in range(x_size):
+
+                # x_ij x_ij term
                 x_ij = 'x' + str(i) + str(j)
                 self.qubo[(x_ij, x_ij)] += weights[j] * weights[j]
+
+                # x_ij x_ik term
                 for k in range(j + 1, x_size):
                     self.qubo[(x_ij, 'x' + str(i) + str(k))] += 2 * weights[j] * weights[k]
+
             for j in range(k_limit):
+
+                # k_ij k_ij term
                 k_ij = 'k' + str(i) + str(j)
                 self.qubo[(k_ij, k_ij)] = (2 ** j) * (2 ** j)
+
+                # k_ij k_ik term
                 for k in range(j + 1, k_limit):
                     self.qubo[(k_ij, 'k' + str(i) + str(k))] = 2 * (2 ** j) * (2 ** k)
 
         for i in range(x_size):
+
             y_i = 'y' + str(i)
             for j in range(x_size):
+                # x_ij y_i terms
                 self.qubo[('x' + str(i) + str(j), y_i)] = -2 * V * weights[j]
             for j in range(k_limit):
+                # k_ij y_i terms
                 self.qubo[('k' + str(i) + str(j), y_i)] = -2 * V * (2 ** j)
 
+        # x_ij k_ik terms
         for i in range(x_size):
             for j in range(x_size):
                 for k in range(k_limit):
                     self.qubo[('x' + str(i) + str(j), 'k' + str(i) + str(k))] = 2 * weights[j] * (2 ** k)
 
-        # Sum over all bins - to minimize
+        # Sum over all bins - this is the number to  minimize
         for i in range(x_size):
             y_i = 'y' + str(i)
             self.qubo[(y_i, y_i)] = Lagrange
