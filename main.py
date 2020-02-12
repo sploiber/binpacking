@@ -50,7 +50,8 @@ def main(data_file_name, bin_size):
     df.columns = ['name', 'wt']
 
     # create the BinPacking object
-    BP = BinPacking(df['name'], df['wt'], V)
+    Lagrange = 2500
+    BP = BinPacking(df['name'], df['wt'], V, Lagrange)
 
     # Obtain the knapsack BQM
     bqm = BP.get_bqm()

@@ -25,17 +25,13 @@ from math import ceil
 
 class BinPacking(object):
 
-    def __init__(self, names, weights, V):
+    def __init__(self, names, weights, V, Lagrange):
 
         self.names = names
         self.weights = weights
 
         # Initialize QUBO matrix
         self.qubo = defaultdict(float)
-
-        # Lagrangian multiplier
-        #A = max(weights)
-        A = 2500
 
         # determine how big the slack variables need to be
         x_diff = V - sum(weights)
@@ -71,7 +67,7 @@ class BinPacking(object):
 
         # Sum over all bins - to minimize
         for i in range(x_size):
-            self.qubo[('y' + str(i), 'y' + str(i))] = A
+            self.qubo[('y' + str(i), 'y' + str(i))] = Lagrange
 
     def get_bqm(self):
         return dimod.BinaryQuadraticModel.from_qubo(self.qubo)
